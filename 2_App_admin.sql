@@ -301,3 +301,72 @@ BEGIN
     COMMIT;
 END add_warehouse;
 /
+
+-- Procedure for adding a new Product
+CREATE OR REPLACE PROCEDURE add_product(
+    in_category_id NUMBER,
+    in_product_name VARCHAR2,
+    in_description VARCHAR2,
+    in_product_quantity NUMBER,
+    in_product_cost NUMBER
+) AS
+BEGIN
+    INSERT INTO product VALUES (
+        product_id_seq.NEXTVAL,
+        in_category_id,
+        in_product_name,
+        in_description,
+        in_product_quantity,
+        in_product_cost
+    );
+    DBMS_OUTPUT.PUT_LINE('Product Added');
+    COMMIT;
+END add_product;
+/
+-- Procedure for adding a new Ware Product
+CREATE OR REPLACE PROCEDURE add_ware_product(
+    in_warehouse_id NUMBER,
+    in_product_id NUMBER,
+    in_stock_quantity NUMBER
+) AS
+BEGIN
+    INSERT INTO ware_product VALUES (
+        ware_product_id_seq.NEXTVAL,
+        in_warehouse_id,
+        in_product_id,
+        in_stock_quantity
+    );
+    DBMS_OUTPUT.PUT_LINE('Ware Product Added');
+    COMMIT;
+END add_ware_product;
+/
+-- Procedure for adding a new user
+CREATE OR REPLACE PROCEDURE add_user(
+    in_role_id NUMBER,
+    in_user_name VARCHAR2,
+    in_email_address VARCHAR2,
+    in_street_address VARCHAR2,
+    in_city VARCHAR2,
+    in_zipcode VARCHAR2,
+    in_country VARCHAR2,
+    in_state VARCHAR2,
+    in_phone_number VARCHAR2
+) AS
+BEGIN
+    INSERT INTO user_table VALUES (
+        user_id_seq.NEXTVAL,
+        in_role_id,
+        in_user_name,
+        in_email_address,
+        in_street_address,
+        in_city,
+        in_zipcode,
+        in_country,
+        in_state,
+        in_phone_number
+    );
+    DBMS_OUTPUT.PUT_LINE('User Added');
+    COMMIT;
+END add_user;
+/
+
