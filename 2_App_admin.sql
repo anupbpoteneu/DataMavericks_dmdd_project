@@ -301,3 +301,22 @@ BEGIN
     COMMIT;
 END add_warehouse;
 /
+
+
+--------------------------------------------------------------------------------------------------------
+
+--Inserting records
+ 
+--Roles table:
+EXEC add_role('Admin');
+EXEC add_role('Customer');
+EXEC add_role('Product Manager');
+EXEC add_role('Inventory Manager');
+
+---User table data:
+EXEC add_user(1, 'App_admin', 'admin@example.com', '456 Admin St', 'AdminCity', 'Admin12345', 'AdminLand', 'AdminState', '123-456-7890');
+EXEC add_user(2, 'customer1', 'customer1@example.com', '123 Customer St', 'CustomerCity', 'Customer12345', 'CustomerLand', 'CustomerState', '987-654-3210');
+EXEC add_user(2, 'customer2', 'customer2@example.com', '789 Customer St', 'CustomerCity', 'Customer54321', 'CustomerLand', 'CustomerState', '555-555-5555');
+EXEC add_user(3, 'product_manager', 'productmanager@example.com', '789 Prod Manager St', 'ProdManagerCity', 'ProdManager54321', 'ProdManagerLand', 'ProdManagerState', '555-555-5556');
+EXEC add_user(4, 'inventory_manager', 'inventorymanager@example.com', '456 Inv Manager St', 'InvManagerCity', 'InvManager12345', 'InvManagerLand', 'InvManagerState', '123-456-7891');
+
