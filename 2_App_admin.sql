@@ -370,3 +370,64 @@ BEGIN
 END add_user;
 /
 
+-- Procedure for adding a new Order
+CREATE OR REPLACE PROCEDURE add_order(
+    in_user_id NUMBER,
+    in_order_qty NUMBER,
+    in_order_status VARCHAR2
+) AS
+BEGIN
+    INSERT INTO order_table VALUES (
+        order_id_seq.NEXTVAL,
+        in_user_id,
+        in_order_qty,
+        in_order_status,
+        SYSDATE
+    );
+    DBMS_OUTPUT.PUT_LINE('Order Added');
+    COMMIT;
+END add_order;
+/
+-- Procedure for adding a new User Product
+CREATE OR REPLACE PROCEDURE add_user_product(
+    in_product_id NUMBER,
+    in_order_id NUMBER,
+    in_up_quantity NUMBER
+) AS
+    v_product_cost NUMBER;
+BEGIN
+    -- Retrieve the product cost
+    SELECT product_cost INTO v_product_cost
+    FROM product
+    WHERE product_id = in_product_id;
+    -- Insert into user_product with calculated up_price
+    INSERT INTO user_product VALUES (
+        user_product_id_seq.NEXTVAL,
+        in_product_id,
+        in_order_id,
+        in_up_quantity,
+        in_up_quantity * v_product_cost -- Calculate up_price
+    );
+    DBMS_OUTPUT.PUT_LINE('User Product Added');
+    COMMIT;
+END add_user_product;
+/
+-- Procedure for adding a new Payment
+CREATE OR REPLACE PROCEDURE add_payment(
+    in_order_id NUMBER,
+    in_payment_mode VARCHAR2,
+    in_payment_status VARCHAR2
+) AS
+BEGIN
+    INSERT INTO payment VALUES (
+    payment_id_seq.NEXTVAL,
+        in_order_id,
+        in_payment_mode,
+        SYSDATE,
+        in_payment_status
+    );
+    DBMS_OUTPUT.PUT_LINE('Payment Added');
+    COMMIT;
+END add_payment;
+/
+ 
