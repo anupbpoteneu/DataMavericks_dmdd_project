@@ -303,7 +303,136 @@ END add_warehouse;
 /
 
 
---------------------------------------------------------------------------------------------------------
+-- Procedure for adding a new Product
+CREATE OR REPLACE PROCEDURE add_product(
+    in_category_id NUMBER,
+    in_product_name VARCHAR2,
+    in_description VARCHAR2,
+    in_product_quantity NUMBER,
+    in_product_cost NUMBER
+) AS
+BEGIN
+    INSERT INTO product VALUES (
+        product_id_seq.NEXTVAL,
+        in_category_id,
+        in_product_name,
+        in_description,
+        in_product_quantity,
+        in_product_cost
+    );
+    DBMS_OUTPUT.PUT_LINE('Product Added');
+    COMMIT;
+END add_product;
+/
+-- Procedure for adding a new Ware Product
+CREATE OR REPLACE PROCEDURE add_ware_product(
+    in_warehouse_id NUMBER,
+    in_product_id NUMBER,
+    in_stock_quantity NUMBER
+) AS
+BEGIN
+    INSERT INTO ware_product VALUES (
+        ware_product_id_seq.NEXTVAL,
+        in_warehouse_id,
+        in_product_id,
+        in_stock_quantity
+    );
+    DBMS_OUTPUT.PUT_LINE('Ware Product Added');
+    COMMIT;
+END add_ware_product;
+/
+-- Procedure for adding a new user
+CREATE OR REPLACE PROCEDURE add_user(
+    in_role_id NUMBER,
+    in_user_name VARCHAR2,
+    in_email_address VARCHAR2,
+    in_street_address VARCHAR2,
+    in_city VARCHAR2,
+    in_zipcode VARCHAR2,
+    in_country VARCHAR2,
+    in_state VARCHAR2,
+    in_phone_number VARCHAR2
+) AS
+BEGIN
+    INSERT INTO user_table VALUES (
+        user_id_seq.NEXTVAL,
+        in_role_id,
+        in_user_name,
+        in_email_address,
+        in_street_address,
+        in_city,
+        in_zipcode,
+        in_country,
+        in_state,
+        in_phone_number
+    );
+    DBMS_OUTPUT.PUT_LINE('User Added');
+    COMMIT;
+END add_user;
+/
+
+-- Procedure for adding a new Order
+CREATE OR REPLACE PROCEDURE add_order(
+    in_user_id NUMBER,
+    in_order_qty NUMBER,
+    in_order_status VARCHAR2
+) AS
+BEGIN
+    INSERT INTO order_table VALUES (
+        order_id_seq.NEXTVAL,
+        in_user_id,
+        in_order_qty,
+        in_order_status,
+        SYSDATE
+    );
+    DBMS_OUTPUT.PUT_LINE('Order Added');
+    COMMIT;
+END add_order;
+/
+-- Procedure for adding a new User Product
+CREATE OR REPLACE PROCEDURE add_user_product(
+    in_product_id NUMBER,
+    in_order_id NUMBER,
+    in_up_quantity NUMBER
+) AS
+    v_product_cost NUMBER;
+BEGIN
+    -- Retrieve the product cost
+    SELECT product_cost INTO v_product_cost
+    FROM product
+    WHERE product_id = in_product_id;
+    -- Insert into user_product with calculated up_price
+    INSERT INTO user_product VALUES (
+        user_product_id_seq.NEXTVAL,
+        in_product_id,
+        in_order_id,
+        in_up_quantity,
+        in_up_quantity * v_product_cost -- Calculate up_price
+    );
+    DBMS_OUTPUT.PUT_LINE('User Product Added');
+    COMMIT;
+END add_user_product;
+/
+-- Procedure for adding a new Payment
+CREATE OR REPLACE PROCEDURE add_payment(
+    in_order_id NUMBER,
+    in_payment_mode VARCHAR2,
+    in_payment_status VARCHAR2
+) AS
+BEGIN
+    INSERT INTO payment VALUES (
+    payment_id_seq.NEXTVAL,
+        in_order_id,
+        in_payment_mode,
+        SYSDATE,
+        in_payment_status
+    );
+    DBMS_OUTPUT.PUT_LINE('Payment Added');
+    COMMIT;
+END add_payment;
+/
+ 
+------------------------------------------------------------
 
 --Inserting records
  
@@ -319,4 +448,3 @@ EXEC add_user(2, 'customer1', 'customer1@example.com', '123 Customer St', 'Custo
 EXEC add_user(2, 'customer2', 'customer2@example.com', '789 Customer St', 'CustomerCity', 'Customer54321', 'CustomerLand', 'CustomerState', '555-555-5555');
 EXEC add_user(3, 'product_manager', 'productmanager@example.com', '789 Prod Manager St', 'ProdManagerCity', 'ProdManager54321', 'ProdManagerLand', 'ProdManagerState', '555-555-5556');
 EXEC add_user(4, 'inventory_manager', 'inventorymanager@example.com', '456 Inv Manager St', 'InvManagerCity', 'InvManager12345', 'InvManagerLand', 'InvManagerState', '123-456-7891');
-
