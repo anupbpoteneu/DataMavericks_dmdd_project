@@ -50,3 +50,15 @@ grant select on vw_warehouse to inventory_manager;
 --revoke select on product_category from inventory_manager;
 --revoke select on ware_product from inventory_manager;
 --revoke select on warehouse from inventory_manager;
+-----
+-----
+-----
+--customer1
+create user customer1 identified by PasswordMaverick4;
+grant create session to customer1;
+grant execute on add_user_product to customer1;
+grant execute on add_payment to customer1;
+grant execute on add_order to customer1;
+grant select on vw_product to customer1;
+grant select on vw_product_category to customer1;
+----
