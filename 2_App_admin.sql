@@ -257,4 +257,47 @@ SELECT * FROM ROLES;
 CREATE OR REPLACE VIEW VW_WAREHOUSE AS
 SELECT * FROM WAREHOUSE;
 
+---------------------------------------------------------------------------------------
+--Procedures Creation
 
+-- Procedure for adding a new Role
+CREATE OR REPLACE PROCEDURE add_role(in_role_name VARCHAR2) AS
+BEGIN
+    INSERT INTO roles VALUES (role_id_seq.NEXTVAL, in_role_name);
+    DBMS_OUTPUT.PUT_LINE('Role Added');
+    COMMIT;
+END add_role;
+/
+-- Procedure for adding a new Product Category
+CREATE OR REPLACE PROCEDURE add_product_category(in_category_name VARCHAR2) AS
+BEGIN
+    INSERT INTO product_category VALUES (category_id_seq.NEXTVAL, in_category_name);
+    DBMS_OUTPUT.PUT_LINE('Product Category Added');
+    COMMIT;
+END add_product_category;
+/
+-- Procedure for adding a new Warehouse
+CREATE OR REPLACE PROCEDURE add_warehouse(
+    in_warehouse_name VARCHAR2,
+    in_total_capacity NUMBER,
+    in_street_address VARCHAR2,
+    in_zip_code VARCHAR2,
+    in_city VARCHAR2,
+    in_state VARCHAR2,
+    in_country VARCHAR2
+) AS
+BEGIN
+    INSERT INTO warehouse VALUES (
+        warehouse_id_seq.NEXTVAL,
+        in_warehouse_name,
+        in_total_capacity,
+        in_street_address,
+        in_zip_code,
+        in_city,
+        in_state,
+        in_country
+    );
+    DBMS_OUTPUT.PUT_LINE('Warehouse Added');
+    COMMIT;
+END add_warehouse;
+/
