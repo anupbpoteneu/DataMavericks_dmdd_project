@@ -3,11 +3,11 @@ alter session set current_schema=App_admin;
 SET SERVEROUTPUT ON
 
 ----Warehouse:
-EXEC add_warehouse('Amazon', 10000, '123 Amazon St', '54321', 'Amazon City', 'Amazon State', 'Amazon Land');
-EXEC add_warehouse('Flipkart', 8000, '456 Flipkart St', '12345', 'Flipkart Town', 'Flipkart State', 'Flipkart Land');
-EXEC add_warehouse('Alibaba', 12000, '789 Alibaba St', '67890', 'Alibaba Village', 'Alibaba State', 'Alibaba Land');
-EXEC add_warehouse('Reliance', 9000, '101 Reliance St', '11223', 'Reliance Metropolis', 'Reliance State', 'Reliance Land');
-EXEC add_warehouse('Tata', 15000, '202 Tata St', '33445', 'Tata City', 'Tata State', 'Tata Land');
+EXEC add_warehouse('Amazon', 100, '789 Baker Street', '54321', 'Boston', 'Massachusetts', 'USA');
+EXEC add_warehouse('Flipkart', 100, '123 Beckon St', '12345', 'Atlanta', 'Georgia', 'USA');
+EXEC add_warehouse('Alibaba', 100, '789 Bolyston st', '67890', 'Newyork', 'Newyork', 'USA');
+EXEC add_warehouse('Reliance', 100, '123 Harbour Street', '11223', 'Sydney', 'Sydney', 'Australia');
+EXEC add_warehouse('Tata', 100, '789 Sakura Avenue', '33445', 'Tokyo', 'Tokyo', 'Japan');
 
 
 ----Ware Product:

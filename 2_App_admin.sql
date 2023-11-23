@@ -126,11 +126,11 @@ CREATE TABLE PRODUCT (
 );
 
 CREATE TABLE WARE_PRODUCT (
-    SURROGATE_KEY NUMBER(20) DEFAULT WARE_PRODUCT_ID_SEQ.NEXTVAL NOT NULL,
+    WARE_PRODUCT_ID NUMBER(20) DEFAULT WARE_PRODUCT_ID_SEQ.NEXTVAL NOT NULL,
     WAREHOUSE_ID NUMBER(6) NOT NULL,
     PRODUCT_ID NUMBER(6) NOT NULL,
     STOCK_QUANTITY NUMBER,
-    PRIMARY KEY (SURROGATE_KEY),
+    PRIMARY KEY (WARE_PRODUCT_ID),
     CONSTRAINT WARE_PRODUCT_WAREHOUSE_FK FOREIGN KEY (WAREHOUSE_ID) REFERENCES WAREHOUSE(WAREHOUSE_ID) ON DELETE CASCADE,
     CONSTRAINT WARE_PRODUCT_PRODUCT_FK FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT(PRODUCT_ID) ON DELETE CASCADE
 );
@@ -161,12 +161,12 @@ CREATE TABLE ORDER_TABLE (
 );
  
 CREATE TABLE USER_PRODUCT (
-    SURROGATE_KEY NUMBER(20) DEFAULT USER_PRODUCT_ID_SEQ.NEXTVAL NOT NULL,
+    USER_PRODUCT_ID NUMBER(20) DEFAULT USER_PRODUCT_ID_SEQ.NEXTVAL NOT NULL,
     PRODUCT_ID NUMBER(6) NOT NULL,
     ORDER_ID NUMBER(10) NOT NULL,
     UP_QUANTITY NUMBER,
     UP_PRICE NUMBER,
-    PRIMARY KEY (SURROGATE_KEY),
+    PRIMARY KEY (USER_PRODUCT_ID),
     CONSTRAINT USER_PRODUCT_PRODUCT_FK FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT(PRODUCT_ID) ON DELETE CASCADE,
     CONSTRAINT USER_PRODUCT_ORDER_FK FOREIGN KEY (ORDER_ID) REFERENCES ORDER_TABLE(ORDER_ID) ON DELETE CASCADE
 );
@@ -373,6 +373,7 @@ WHEN E_EXISTS THEN
 	
 END add_product;
 /
+
 -- Procedure for adding a new Ware Product
 CREATE OR REPLACE PROCEDURE add_ware_product(
     in_warehouse_id NUMBER,
@@ -390,6 +391,7 @@ BEGIN
     COMMIT;
 END add_ware_product;
 /
+
 -- Procedure for adding a new user
 CREATE OR REPLACE PROCEDURE add_user(
     in_role_id NUMBER,
@@ -451,6 +453,7 @@ BEGIN
     COMMIT;
 END add_order;
 /
+
 -- Procedure for adding a new User Product
 CREATE OR REPLACE PROCEDURE add_user_product(
     in_product_id NUMBER,
@@ -505,8 +508,8 @@ EXEC add_role('Product Manager');
 EXEC add_role('Inventory Manager');
 
 ---User table data:
-EXEC add_user(1, 'App_admin', 'admin@example.com', '456 Admin St', 'AdminCity', 'Admin12345', 'AdminLand', 'AdminState', '123-456-7890');
-EXEC add_user(2, 'customer1', 'customer1@example.com', '123 Customer St', 'CustomerCity', 'Customer12345', 'CustomerLand', 'CustomerState', '987-654-3210');
-EXEC add_user(2, 'customer2', 'customer2@example.com', '789 Customer St', 'CustomerCity', 'Customer54321', 'CustomerLand', 'CustomerState', '555-555-5555');
-EXEC add_user(3, 'product_manager', 'productmanager@example.com', '789 Prod Manager St', 'ProdManagerCity', 'ProdManager54321', 'ProdManagerLand', 'ProdManagerState', '555-555-5556');
-EXEC add_user(4, 'inventory_manager', 'inventorymanager@example.com', '456 Inv Manager St', 'InvManagerCity', 'InvManager12345', 'InvManagerLand', 'InvManagerState', '123-456-7891');
+EXEC add_user(1, 'App_admin', 'admin@example.com', '789 Baker Street', 'Boston', '02120', 'USA', 'Massachusetts', '123-456-7890');
+EXEC add_user(2, 'customer1', 'customer1@example.com', '123 Beckon St', 'Atlanta', '05150', 'USA', 'Georgia', '987-654-3210');
+EXEC add_user(2, 'customer2', 'customer2@example.com', '789 Bolyston st', 'Newyork', '0666','USA', 'Newyork', '555-555-5555');
+EXEC add_user(3, 'product_manager', 'productmanager@example.com', '123 Harbour Street','Sydney', '0780', 'Australia', 'Sydney', '555-555-5556');
+EXEC add_user(4, 'inventory_manager', 'inventorymanager@example.com', '789 Sakura Avenue', 'Tokyo', '0888', 'Japan', 'Tokyo', '123-456-7891');
