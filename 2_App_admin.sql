@@ -262,18 +262,43 @@ SELECT * FROM WAREHOUSE;
 
 -- Procedure for adding a new Role
 CREATE OR REPLACE PROCEDURE add_role(in_role_name VARCHAR2) AS
+V_EXISTS VARCHAR(5);
+E_EXISTS EXCEPTION;
 BEGIN
+	SELECT 'Y' INTO V_EXISTS FROM ROLES WHERE ROLE_NAME=in_role_name;
+	IF(V_EXISTS='Y')
+	THEN RAISE E_EXISTS;
+	END IF;
+	
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
     INSERT INTO roles VALUES (role_id_seq.NEXTVAL, in_role_name);
     DBMS_OUTPUT.PUT_LINE('Role Added');
-    COMMIT;
+	COMMIT;
+WHEN E_EXISTS THEN
+    DBMS_OUTPUT.PUT_LINE('Role already exists');
+
+
 END add_role;
 /
 -- Procedure for adding a new Product Category
 CREATE OR REPLACE PROCEDURE add_product_category(in_category_name VARCHAR2) AS
+V_EXISTS VARCHAR(5);
+E_EXISTS EXCEPTION;
 BEGIN
-    INSERT INTO product_category VALUES (category_id_seq.NEXTVAL, in_category_name);
+	SELECT 'Y' INTO V_EXISTS FROM product_category WHERE category_name=in_category_name;
+	IF(V_EXISTS='Y')
+	THEN RAISE E_EXISTS;
+	END IF;
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+	INSERT INTO product_category VALUES (category_id_seq.NEXTVAL, in_category_name);
     DBMS_OUTPUT.PUT_LINE('Product Category Added');
     COMMIT;
+WHEN E_EXISTS THEN
+    DBMS_OUTPUT.PUT_LINE('Category already exists');
+	
 END add_product_category;
 /
 -- Procedure for adding a new Warehouse
@@ -286,8 +311,17 @@ CREATE OR REPLACE PROCEDURE add_warehouse(
     in_state VARCHAR2,
     in_country VARCHAR2
 ) AS
+V_EXISTS VARCHAR(5);
+E_EXISTS EXCEPTION;
 BEGIN
-    INSERT INTO warehouse VALUES (
+    SELECT 'Y' INTO V_EXISTS FROM warehouse WHERE warehouse_name=in_warehouse_name;
+	IF(V_EXISTS='Y')
+	THEN RAISE E_EXISTS;
+	END IF;
+	
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+	INSERT INTO warehouse VALUES (
         warehouse_id_seq.NEXTVAL,
         in_warehouse_name,
         in_total_capacity,
@@ -299,6 +333,8 @@ BEGIN
     );
     DBMS_OUTPUT.PUT_LINE('Warehouse Added');
     COMMIT;
+WHEN E_EXISTS THEN
+    DBMS_OUTPUT.PUT_LINE('Warehouse already exists');
 END add_warehouse;
 /
 
@@ -311,8 +347,18 @@ CREATE OR REPLACE PROCEDURE add_product(
     in_product_quantity NUMBER,
     in_product_cost NUMBER
 ) AS
+V_EXISTS VARCHAR(5);
+E_EXISTS EXCEPTION;
 BEGIN
-    INSERT INTO product VALUES (
+	SELECT 'Y' INTO V_EXISTS FROM product WHERE product_name=in_product_name;
+	IF(V_EXISTS='Y')
+	THEN RAISE E_EXISTS;
+	END IF;
+    
+	
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+	INSERT INTO product VALUES (
         product_id_seq.NEXTVAL,
         in_category_id,
         in_product_name,
@@ -322,6 +368,9 @@ BEGIN
     );
     DBMS_OUTPUT.PUT_LINE('Product Added');
     COMMIT;
+WHEN E_EXISTS THEN
+    DBMS_OUTPUT.PUT_LINE('Product already exists');
+	
 END add_product;
 /
 -- Procedure for adding a new Ware Product
@@ -353,8 +402,18 @@ CREATE OR REPLACE PROCEDURE add_user(
     in_state VARCHAR2,
     in_phone_number VARCHAR2
 ) AS
+V_EXISTS VARCHAR(5);
+E_EXISTS EXCEPTION;
 BEGIN
-    INSERT INTO user_table VALUES (
+
+	SELECT 'Y' INTO V_EXISTS FROM user_table WHERE user_name=in_user_name;
+	IF(V_EXISTS='Y')
+	THEN RAISE E_EXISTS;
+	END IF;
+    
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+	INSERT INTO user_table VALUES (
         user_id_seq.NEXTVAL,
         in_role_id,
         in_user_name,
@@ -368,6 +427,9 @@ BEGIN
     );
     DBMS_OUTPUT.PUT_LINE('User Added');
     COMMIT;
+WHEN E_EXISTS THEN
+    DBMS_OUTPUT.PUT_LINE('User already exists');	
+
 END add_user;
 /
 
