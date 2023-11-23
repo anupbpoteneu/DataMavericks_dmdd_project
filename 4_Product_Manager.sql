@@ -22,8 +22,7 @@ EXEC add_product(4, 'Apple Watch Series 7', 'Advanced Apple smartwatch', 30, 399
 EXEC add_product(5, 'Harry Potter ', 'Fantasy novel by J.K. Rowling', 100, 19.99);
 EXEC add_product(5, 'The Alchemist', 'Philosophical novel by Paulo Coelho', 80, 15.99);
 
-select * from vw_product_category;
-select * from vw_product;
-select * from vw_user_product;
---select * from vw_paymnet;
-select * from vw_order_table;
+
+
+--select * from vw_product_category;
+--select * from vw_product;
