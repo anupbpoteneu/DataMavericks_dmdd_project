@@ -62,3 +62,12 @@ grant execute on add_order to customer1;
 grant select on vw_product to customer1;
 grant select on vw_product_category to customer1;
 ----
+
+--customer2
+create user customer2 identified by PasswordMaverick5;
+grant create session to customer2;
+grant execute on add_user_product to customer2;
+grant execute on add_payment to customer2;
+grant execute on add_order to customer2;
+grant select on vw_product to customer2;
+grant select on vw_product_category to customer2;
