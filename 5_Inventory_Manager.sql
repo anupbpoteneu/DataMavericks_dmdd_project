@@ -23,7 +23,7 @@ EXEC add_ware_product(5, 9, 50);
 EXEC add_ware_product(5, 10, 40);
 
 
-select * from vw_product_category;
-select * from vw_product;
-select * from vw_ware_product;
-select * from vw_warehouse;
+--select * from vw_product_category;
+--select * from vw_product;
+--select * from vw_ware_product;
+--select * from vw_warehouse;
