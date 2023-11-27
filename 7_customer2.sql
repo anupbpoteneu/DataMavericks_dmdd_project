@@ -33,5 +33,17 @@ EXEC add_payment(9, 'Cash', 'Completed');
 EXEC add_payment(10, 'Cash', 'Failed');
 
 
+
+-----------------------------------------------------------------
+--Testing customer 2 data (updated)
+
+EXEC add_order(3 , 'Completed');
+EXEC add_user_product(3, 2, 3);
+EXEC add_user_product(4, 2, 5);
+EXEC add_payment(2, 'Pay Pal', 'Completed');
+
+
+------------------------------------------------------------------
+
 --select * from vw_product_category;
 --select * from vw_product;
