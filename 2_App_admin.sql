@@ -388,8 +388,51 @@ CREATE OR REPLACE PROCEDURE add_ware_product(
     in_product_id NUMBER,
     in_stock_quantity NUMBER
 ) AS
+V_EXISTS VARCHAR(10):='N';
+V_WAREHOUSE_EXISTS VARCHAR(10):='N';
+V_PRODUCT_EXISTS VARCHAR(10):='N';
+V_WARE_CAPACITY NUMBER;
+E_INVALID_STOCK EXCEPTION;
 BEGIN
-    INSERT INTO ware_product VALUES (
+	
+	SELECT 'Y' INTO V_WAREHOUSE_EXISTS 
+	FROM WAREHOUSE
+	WHERE WAREHOUSE_ID=in_warehouse_id;
+	
+	SELECT 'Y' INTO V_PRODUCT_EXISTS 
+	FROM PRODUCT
+	WHERE PRODUCT_ID=in_product_id;
+	
+	SELECT TOTAL_CAPACITY INTO V_WARE_CAPACITY
+	FROM WAREHOUSE
+	WHERE WAREHOUSE_ID=in_warehouse_id;
+	
+	IF(in_stock_quantity<0 OR in_stock_quantity>V_WARE_CAPACITY)
+	THEN RAISE E_INVALID_STOCK;
+    END IF;
+	
+	SELECT 'Y' INTO V_EXISTS 
+	FROM WARE_PRODUCT
+	WHERE WAREHOUSE_ID=in_warehouse_id
+	AND PRODUCT_ID=in_product_id;
+    
+    IF(V_EXISTS='Y') THEN
+    DBMS_OUTPUT.PUT_LINE('The product you are trying to add into this warehouse already exists');
+	END IF;
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN	
+
+	IF (V_WAREHOUSE_EXISTS='N') THEN
+	    DBMS_OUTPUT.PUT_LINE('Warehouse does not exist. Therefore you cannot add product into this warehouse');
+		
+	ELSIF (V_PRODUCT_EXISTS='N') THEN
+	    DBMS_OUTPUT.PUT_LINE('Product is invalid. Try to add another product that exists.');
+
+	ELSIF (V_EXISTS='N') THEN
+    DBMS_OUTPUT.PUT_LINE('Ware Product does not exist. You can add product into this warehouse');
+	
+	INSERT INTO ware_product VALUES (
         ware_product_id_seq.NEXTVAL,
         in_warehouse_id,
         in_product_id,
@@ -397,6 +440,11 @@ BEGIN
     );
     DBMS_OUTPUT.PUT_LINE('Ware Product Added');
     COMMIT;
+	END IF;
+	
+WHEN E_INVALID_STOCK THEN
+	DBMS_OUTPUT.PUT_LINE('Quantity must be greater than 0 and less than or equal to warehouse capacity');
+
 END add_ware_product;
 /
 
@@ -416,7 +464,8 @@ V_EXISTS VARCHAR(5);
 E_EXISTS EXCEPTION;
 BEGIN
 
-	SELECT 'Y' INTO V_EXISTS FROM user_table WHERE user_name=in_user_name;
+	SELECT 'Y' INTO V_EXISTS FROM user_table WHERE user_name=in_user_name OR email_address=in_email_address;
+		
 	IF(V_EXISTS='Y')
 	THEN RAISE E_EXISTS;
 	END IF;
@@ -438,7 +487,7 @@ WHEN NO_DATA_FOUND THEN
     DBMS_OUTPUT.PUT_LINE('User Added');
     COMMIT;
 WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('User already exists');	
+    DBMS_OUTPUT.PUT_LINE('User already exists with same user name or email address');	
 
 END add_user;
 /
@@ -446,10 +495,14 @@ END add_user;
 -- Procedure for adding a new Order
 CREATE OR REPLACE PROCEDURE add_order(
     in_user_id NUMBER,
-    in_order_qty NUMBER,
     in_order_status VARCHAR2
 ) AS
 BEGIN
+
+	IF (in_order_status !='Pending') THEN
+    DBMS_OUTPUT.PUT_LINE('Order status is invalid.');
+	
+	ELSE
     INSERT INTO order_table VALUES (
         order_id_seq.NEXTVAL,
         in_user_id,
@@ -459,6 +512,7 @@ BEGIN
     );
     DBMS_OUTPUT.PUT_LINE('Order Added');
     COMMIT;
+	END IF;
 END add_order;
 /
 
@@ -469,21 +523,49 @@ CREATE OR REPLACE PROCEDURE add_user_product(
     in_up_quantity NUMBER
 ) AS
     v_product_cost NUMBER;
+    v_order_exist varchar(10):='N';
+    v_product_exist varchar(10):='N';
 BEGIN
-    -- Retrieve the product cost
-    SELECT product_cost INTO v_product_cost
-    FROM product
-    WHERE product_id = in_product_id;
-    -- Insert into user_product with calculated up_price
-    INSERT INTO user_product VALUES (
-        user_product_id_seq.NEXTVAL,
-        in_product_id,
-        in_order_id,
-        in_up_quantity,
-        in_up_quantity * v_product_cost -- Calculate up_price
-    );
-    DBMS_OUTPUT.PUT_LINE('User Product Added');
-    COMMIT;
+
+    --Check if Order exists
+    SELECT 'Y' INTO v_order_exist
+    FROM ORDER_TABLE
+    WHERE order_id=in_order_id
+    and order_status='Pending';
+    
+    SELECT 'Y' INTO v_product_exist
+    FROM PRODUCT
+    WHERE product_id=in_product_id;
+     
+    IF (in_up_quantity<=0) THEN
+        DBMS_OUTPUT.PUT_LINE('Quantity must be greater than 0');
+    
+    ELSE
+        -- Retrieve the product cost
+        SELECT product_cost INTO v_product_cost
+        FROM product
+        WHERE product_id = in_product_id;
+                
+        -- Insert into user_product with calculated up_price
+        INSERT INTO user_product VALUES (
+            user_product_id_seq.NEXTVAL,
+            in_product_id,
+            in_order_id,
+            in_up_quantity,
+            in_up_quantity * v_product_cost -- Calculate up_price
+        );
+        DBMS_OUTPUT.PUT_LINE('User Product Added');
+        COMMIT;
+    END IF;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+IF (v_order_exist='N') THEN
+DBMS_OUTPUT.PUT_LINE('You cannot add products against an order which is already completed or does not exist. Please place a new order and add products to it!');
+
+ELSIF(v_product_exist='N') THEN
+DBMS_OUTPUT.PUT_LINE('Unfortunately, the product you have chosen does not exist in our catalog.');
+END IF;   
+
 END add_user_product;
 /
 -- Procedure for adding a new Payment
@@ -492,7 +574,22 @@ CREATE OR REPLACE PROCEDURE add_payment(
     in_payment_mode VARCHAR2,
     in_payment_status VARCHAR2
 ) AS
+V_EXISTS VARCHAR(5);
+E_EXISTS EXCEPTION;
 BEGIN
+
+    SELECT 'Y' INTO V_EXISTS FROM PAYMENT WHERE order_id=in_order_id
+    AND payment_status='Completed' ;
+	
+	IF(V_EXISTS='Y')
+	THEN RAISE E_EXISTS;
+	END IF;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+    IF (in_payment_status NOT IN ('Failed', 'Completed')) THEN
+    DBMS_OUTPUT.PUT_LINE('Payment status is invalid.');
+    
+    ELSE
     INSERT INTO payment VALUES (
     payment_id_seq.NEXTVAL,
         in_order_id,
@@ -500,8 +597,20 @@ BEGIN
         SYSDATE,
         in_payment_status
     );
-    DBMS_OUTPUT.PUT_LINE('Payment Added');
     COMMIT;
+
+    END IF;
+    
+    IF(in_payment_status='Failed') THEN
+    DBMS_OUTPUT.PUT_LINE('Payment failed');
+    
+    ELSIF(in_payment_status='Completed') THEN
+    DBMS_OUTPUT.PUT_LINE('Payment is successfully completed');
+    END IF;
+    
+    WHEN E_EXISTS THEN
+    DBMS_OUTPUT.PUT_LINE('Payment for this order is already completed');
+
 END add_payment;
 /
  
