@@ -503,12 +503,10 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Order status is invalid.');
 	
 	ELSE
-    INSERT INTO order_table VALUES (
+   INSERT INTO order_table (order_id, user_id, order_status) VALUES (
         order_id_seq.NEXTVAL,
         in_user_id,
-        in_order_qty,
-        in_order_status,
-        SYSDATE
+        in_order_status
     );
     DBMS_OUTPUT.PUT_LINE('Order Added');
     COMMIT;
