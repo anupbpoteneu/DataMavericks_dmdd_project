@@ -268,27 +268,37 @@ SELECT * FROM WAREHOUSE;
 ---------------------------------------------------------------------------------------
 --Procedures Creation
 
--- Procedure for adding a new Role
-CREATE OR REPLACE PROCEDURE add_role(in_role_name VARCHAR2) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+CREATE OR REPLACE PROCEDURE add_role (
+    in_role_name VARCHAR2
+) AS
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
-	SELECT 'Y' INTO V_EXISTS FROM ROLES WHERE ROLE_NAME=in_role_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-	
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        roles
+    WHERE
+        role_name = in_role_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-    INSERT INTO roles VALUES (role_id_seq.NEXTVAL, in_role_name);
-    DBMS_OUTPUT.PUT_LINE('Role Added');
-	COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Role already exists');
+    WHEN no_data_found THEN
+        INSERT INTO roles VALUES (
+            role_id_seq.NEXTVAL,
+            in_role_name
+        );
 
-
+        dbms_output.put_line('Role Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Role already exists');
 END add_role;
 /
+
 -- Procedure for adding a new Product Category
 CREATE OR REPLACE PROCEDURE add_product_category(in_category_name VARCHAR2) AS
 V_EXISTS VARCHAR(5);
@@ -507,56 +517,91 @@ END add_user;
 /
 
 -- Procedure for adding a new Order
-CREATE OR REPLACE PROCEDURE add_order(
-    in_user_id NUMBER,
+
+CREATE OR REPLACE PROCEDURE add_order (
+    in_user_id      NUMBER,
     in_order_status VARCHAR2
 ) AS
 BEGIN
+    IF ( in_order_status != 'Pending' ) THEN
+        dbms_output.put_line('Order status is invalid.');
+    ELSE
+        INSERT INTO order_table (
+            order_id,
+            user_id,
+            order_status
+        ) VALUES (
+            order_id_seq.NEXTVAL,
+            in_user_id,
+            in_order_status
+        );
 
-	IF (in_order_status !='Pending') THEN
-    DBMS_OUTPUT.PUT_LINE('Order status is invalid.');
-	
-	ELSE
-   INSERT INTO order_table (order_id, user_id, order_status) VALUES (
-        order_id_seq.NEXTVAL,
-        in_user_id,
-        in_order_status
-    );
-    DBMS_OUTPUT.PUT_LINE('Order Added');
-    COMMIT;
-	END IF;
+        dbms_output.put_line('Order Added');
+        COMMIT;
+    END IF;
 END add_order;
 /
 
 -- Procedure for adding a new User Product
-CREATE OR REPLACE PROCEDURE add_user_product(
-    in_product_id NUMBER,
-    in_order_id NUMBER,
+
+CREATE OR REPLACE PROCEDURE add_user_product (
+    in_product_id  NUMBER,
+    in_order_id    NUMBER,
     in_up_quantity NUMBER
 ) AS
-    v_product_cost NUMBER;
-    v_order_exist varchar(10):='N';
-    v_product_exist varchar(10):='N';
+
+    v_product_cost  NUMBER;
+    v_order_exist   VARCHAR(10) := 'N';
+    v_product_exist VARCHAR(10) := 'N';
+    v_product_qty   NUMBER;
 BEGIN
 
     --Check if Order exists
-    SELECT 'Y' INTO v_order_exist
-    FROM ORDER_TABLE
-    WHERE order_id=in_order_id
-    and order_status='Pending';
-    
-    SELECT 'Y' INTO v_product_exist
-    FROM PRODUCT
-    WHERE product_id=in_product_id;
-     
-    IF (in_up_quantity<=0) THEN
-        DBMS_OUTPUT.PUT_LINE('Quantity must be greater than 0');
-    
+    SELECT
+        'Y'
+    INTO v_order_exist
+    FROM
+        order_table
+    WHERE
+            order_id = in_order_id
+        AND order_status = 'Pending';
+
+    SELECT
+        'Y'
+    INTO v_product_exist
+    FROM
+        product
+    WHERE
+        product_id = in_product_id;
+
+    SELECT
+        product_quantity
+    INTO v_product_qty
+    FROM
+        product
+    WHERE
+        product_id = in_product_id;
+
+    IF ( in_up_quantity <= 0 ) THEN
+        dbms_output.put_line('Quantity must be greater than 0');
+        
+    ELSIF ( v_product_qty = 0 ) THEN
+        dbms_output.put_line('Product currently unavialable.');
+                                 
+    ELSIF ( in_up_quantity > v_product_qty ) THEN
+        dbms_output.put_line('The available quantity of this product is: '
+                             || v_product_qty
+                             || '.Please try to order equal or lesser than the available quantity');
+                                                 
     ELSE
         -- Retrieve the product cost
-        SELECT product_cost INTO v_product_cost
-        FROM product
-        WHERE product_id = in_product_id;
+        SELECT
+            product_cost
+        INTO v_product_cost
+        FROM
+            product
+        WHERE
+            product_id = in_product_id;
                 
         -- Insert into user_product with calculated up_price
         INSERT INTO user_product VALUES (
@@ -566,20 +611,22 @@ BEGIN
             in_up_quantity,
             in_up_quantity * v_product_cost -- Calculate up_price
         );
-        DBMS_OUTPUT.PUT_LINE('User Product Added');
+
+        dbms_output.put_line('User Product Added');
         COMMIT;
     END IF;
+
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-IF (v_order_exist='N') THEN
-DBMS_OUTPUT.PUT_LINE('You cannot add products against an order which is already completed or does not exist. Please place a new order and add products to it!');
-
-ELSIF(v_product_exist='N') THEN
-DBMS_OUTPUT.PUT_LINE('Unfortunately, the product you have chosen does not exist in our catalog.');
-END IF;   
-
+    WHEN no_data_found THEN
+        IF ( v_order_exist = 'N' ) THEN
+            dbms_output.put_line('You cannot add products against an order which is already completed or does not exist. Please place a new order and add products to it!'
+            );
+        ELSIF ( v_product_exist = 'N' ) THEN
+            dbms_output.put_line('Unfortunately, the product you have chosen does not exist in our catalog.');
+        END IF;
 END add_user_product;
 /
+
 -- Procedure for adding a new Payment
 CREATE OR REPLACE PROCEDURE add_payment(
     in_order_id NUMBER,
@@ -625,7 +672,8 @@ EXCEPTION
 
 END add_payment;
 /
- 
+
+
 ------------------------------------------------------------
 
 --Inserting records
