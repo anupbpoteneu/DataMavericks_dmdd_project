@@ -642,3 +642,16 @@ EXEC add_user(2, 'customer1', 'customer1@example.com', '123 Beckon St', 'Atlanta
 EXEC add_user(2, 'customer2', 'customer2@example.com', '789 Bolyston st', 'Newyork', '0666','USA', 'Newyork', '555-555-5555');
 EXEC add_user(3, 'product_manager', 'productmanager@example.com', '123 Harbour Street','Sydney', '0780', 'Australia', 'Sydney', '555-555-5556');
 EXEC add_user(4, 'inventory_manager', 'inventorymanager@example.com', '789 Sakura Avenue', 'Tokyo', '0888', 'Japan', 'Tokyo', '123-456-7891');
+
+---------------------------------------------------------------------------
+--Views for customers
+
+CREATE OR REPLACE VIEW customer1_view AS
+SELECT *
+FROM order_table
+WHERE user_id = 2;
+
+CREATE OR REPLACE VIEW customer2_view AS
+SELECT *
+FROM order_table
+WHERE user_id = 3;
