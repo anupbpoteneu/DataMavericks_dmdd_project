@@ -2,40 +2,150 @@ alter session set current_schema=App_admin;
 
 SET SERVEROUTPUT ON
 
-----Order Table
--- Procedure for adding a new Order
 
-EXEC add_order(1, 5, 'Pending');
-EXEC add_order(1, 4, 'Pending');
-EXEC add_order(1, 2, 'Completed');
-EXEC add_order(1, 5, 'Pending');
+DECLARE
+    v_latest_order_id NUMBER;
+BEGIN
 
+DBMS_OUTPUT.PUT_LINE('TEST CASE 1');
 
-----User_Product table1:
-
-EXEC add_user_product(1, 1, 5);
-EXEC add_user_product(1, 2, 4);
-EXEC add_user_product(1, 3, 2);
-EXEC add_user_product(1, 4, 5);
+add_order(2 , 'Pending');
 
 
-----Payment1
--- Procedure for adding a new Payment
+    -- Fetch the latest order_id for user_id = 2
+    SELECT MAX(order_id) INTO v_latest_order_id
+    FROM customer1_view;
+    
+DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
-EXEC add_payment(1, 'Credit Card', 'Completed');
-EXEC add_payment(2, 'Cash', 'Completed');
-EXEC add_payment(3, 'Credit Card', 'Completed');
-EXEC add_payment(4, 'Credit Card', 'Completed');
+add_user_product(1, v_latest_order_id, 13); 
+add_user_product(2, v_latest_order_id, 12); 
 
-------------------------------------------------------------
---Testing customer 1 data (updated)
+add_payment(v_latest_order_id, 'Credit Card', 'Failed');
+add_payment(v_latest_order_id, 'Credit Card', 'Completed');
 
-EXEC add_order(2 , 'Pending');
-EXEC add_user_product(1, 1, 3);
-EXEC add_user_product(2, 1, 5);
-EXEC add_payment(1, 'Credit Card', 'Failed');
 
---------------------------------------------------------------
+END;
+/
 
---select * from vw_product_category;
---select * from vw_product;
+--select * from customer1_view;
+--select * from customer2_view;
+-----------------------------------------------------------------
+-- 2)
+
+DECLARE
+    v_latest_order_id NUMBER;
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('TEST 2');
+
+    add_order(2 , 'Pending');
+
+    -- Fetch the latest order_id for user_id = 2
+    SELECT MAX(order_id) INTO v_latest_order_id
+    FROM customer1_view;
+
+    DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
+
+    add_user_product(1, v_latest_order_id, 13); 
+    add_user_product(2, v_latest_order_id, 14);
+
+    add_payment(v_latest_order_id, 'Credit Card', 'Failed');
+    add_payment(v_latest_order_id, 'Credit Card', 'Completed');
+END;
+/
+
+-- 3)
+
+DECLARE
+    v_latest_order_id NUMBER;
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('TEST 3');
+
+    add_order(2 , 'Pending');
+
+    -- Fetch the latest order_id for user_id = 2
+    SELECT MAX(order_id) INTO v_latest_order_id
+    FROM customer1_view;
+
+    DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
+
+    add_user_product(1, v_latest_order_id, 18); 
+    add_user_product(2, v_latest_order_id, 19);
+
+    add_payment(v_latest_order_id, 'Credit Card', 'Failed');
+    add_payment(v_latest_order_id, 'Credit Card', 'Completed');
+END;
+/
+
+-- 4)
+
+DECLARE
+    v_latest_order_id NUMBER;
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('TEST 4');
+
+    add_order(2 , 'Pending');
+
+    -- Fetch the latest order_id for user_id = 2
+    SELECT MAX(order_id) INTO v_latest_order_id
+    FROM customer1_view;
+
+    DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
+
+    add_user_product(1, v_latest_order_id, 18); 
+    add_user_product(2, v_latest_order_id, 19);
+
+    add_payment(v_latest_order_id, 'Credit Card', 'Failed');
+    add_payment(v_latest_order_id, 'Credit Card', 'Completed');
+END;
+/
+
+-- 5)
+
+DECLARE
+    v_latest_order_id NUMBER;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('TEST 5');
+
+    add_order(2 , 'Pending');
+
+    -- Fetch the latest order_id for user_id = 2
+    SELECT MAX(order_id) INTO v_latest_order_id
+    FROM customer1_view;
+
+    DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
+
+    add_user_product(1, v_latest_order_id, 9); 
+    add_user_product(2, v_latest_order_id, 10);
+
+    add_payment(v_latest_order_id, 'Credit Card', 'Failed');
+    add_payment(v_latest_order_id, 'Credit Card', 'Completed');
+END;
+/
+
+-- 6)
+
+
+DECLARE
+    v_latest_order_id NUMBER;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('TEST 6');
+
+    add_order(2 , 'Pending');
+
+    -- Fetch the latest order_id for user_id = 2
+    SELECT MAX(order_id) INTO v_latest_order_id
+    FROM customer1_view;
+
+    DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
+
+    add_user_product(1, v_latest_order_id, 9); 
+    add_user_product(2, v_latest_order_id, 10);
+
+    add_payment(v_latest_order_id, 'Credit Card', 'Failed');
+    add_payment(v_latest_order_id, 'Credit Card', 'Completed');
+END;
+/
