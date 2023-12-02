@@ -14,7 +14,7 @@ add_order(3 , 'Pending');
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
     
 DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -43,7 +43,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -67,7 +67,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -91,7 +91,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -114,7 +114,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -138,7 +138,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -161,7 +161,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -184,7 +184,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -208,7 +208,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -231,7 +231,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -254,7 +254,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
@@ -277,7 +277,7 @@ BEGIN
 
     -- Fetch the latest order_id for user_id = 2
     SELECT MAX(order_id) INTO v_latest_order_id
-    FROM customer1_view;
+    FROM customer2_view;
 
     DBMS_OUTPUT.PUT_LINE('Latest Order ID: ' || v_latest_order_id);
 
