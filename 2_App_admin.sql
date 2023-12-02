@@ -791,3 +791,38 @@ BEGIN
     END IF;
 END;
 /
+
+----------------------
+
+---------------------------------------------------
+-- Trigger on Payment Table:
+
+CREATE OR REPLACE TRIGGER trg_payment_completed AFTER
+    INSERT OR UPDATE ON payment
+    FOR EACH ROW
+DECLARE
+    v_order_qty NUMBER;
+BEGIN
+    IF :new.payment_status = 'Completed' THEN
+        -- Calculate the total order quantity
+        SELECT
+            SUM(up_quantity)
+        INTO v_order_qty
+        FROM
+            user_product
+        WHERE
+            order_id = :new.order_id;
+
+        -- Update order_table with the total order quantity and completion date
+        UPDATE order_table
+        SET
+            order_status = 'Completed',
+            order_qty = v_order_qty,
+            order_date = sysdate
+        WHERE
+            order_id = :new.order_id;
+     
+    END IF;
+END;
+/
+
