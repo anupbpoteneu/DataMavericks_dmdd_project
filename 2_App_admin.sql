@@ -826,3 +826,70 @@ BEGIN
 END;
 /
 
+-- Trigger for product and ware_product refill
+
+CREATE OR REPLACE TRIGGER manage_stock_quantity AFTER
+    UPDATE ON product
+DECLARE
+    v_stock_to_reduce NUMBER := 15;
+    v_reduced_qty     NUMBER := 0;
+BEGIN
+    -- Check the recursion flag in the package
+    IF my_package.recursion_flag = 1 THEN
+        -- The trigger has already been executed, exit to avoid recursion
+        my_package.recursion_flag := 0;
+        RETURN;
+    END IF;
+
+    -- Set the recursion flag to 1 to indicate trigger execution
+    my_package.recursion_flag := 1;
+
+    -- Reduce stock quantity in ware_product table
+    << outer_loop >> FOR product_rec IN (
+        SELECT
+            product_id,
+            product_quantity
+        FROM
+            product
+        WHERE
+            product_quantity < 10
+    ) LOOP
+        << inner_loop >> FOR ware_prod IN (
+            SELECT
+                warehouse_id,
+                product_id,
+                stock_quantity
+            FROM
+                ware_product
+            WHERE
+                    product_id = product_rec.product_id
+                AND stock_quantity != 0
+        ) LOOP
+            v_reduced_qty := v_stock_to_reduce - v_reduced_qty;
+            IF ware_prod.stock_quantity >= v_reduced_qty THEN
+                -- Update product table for the specific product
+                UPDATE ware_product
+                SET
+                    stock_quantity = stock_quantity - v_reduced_qty
+                WHERE
+                        product_id = product_rec.product_id
+                    AND warehouse_id = ware_prod.warehouse_id;
+
+                UPDATE product
+                SET
+                    product_quantity = product_quantity + v_reduced_qty
+                WHERE
+                    product_id = product_rec.product_id;
+
+                EXIT inner_loop;
+
+            END IF;
+
+        END LOOP;
+    END LOOP;
+
+--    -- Reset the recursion flag after trigger execution
+    my_package.recursion_flag := 0;
+END;
+/
+
