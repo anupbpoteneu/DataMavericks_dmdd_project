@@ -266,6 +266,19 @@ CREATE OR REPLACE VIEW VW_WAREHOUSE AS
 SELECT * FROM WAREHOUSE;
 
 ---------------------------------------------------------------------------------------
+--Package for creating global flag variable
+
+CREATE OR REPLACE PACKAGE my_package AS
+    recursion_flag NUMBER;
+END my_package;
+/
+
+CREATE OR REPLACE PACKAGE BODY my_package AS
+    recursion_flag NUMBER := 0;
+END my_package;
+/
+
+---------------------------------------------------------------------------------------
 --Procedures Creation
 
 CREATE OR REPLACE PROCEDURE add_role (
@@ -401,68 +414,78 @@ END add_product;
 /
 
 -- Procedure for adding a new Ware Product
-CREATE OR REPLACE PROCEDURE add_ware_product(
-    in_warehouse_id NUMBER,
-    in_product_id NUMBER,
+
+CREATE OR REPLACE PROCEDURE add_ware_product (
+    in_warehouse_id   NUMBER,
+    in_product_id     NUMBER,
     in_stock_quantity NUMBER
 ) AS
-V_EXISTS VARCHAR(10):='N';
-V_WAREHOUSE_EXISTS VARCHAR(10):='N';
-V_PRODUCT_EXISTS VARCHAR(10):='N';
-V_WARE_CAPACITY NUMBER;
-E_INVALID_STOCK EXCEPTION;
+
+    v_exists           VARCHAR(10) := 'N';
+    v_warehouse_exists VARCHAR(10) := 'N';
+    v_product_exists   VARCHAR(10) := 'N';
+    v_ware_capacity    NUMBER;
+    e_invalid_stock EXCEPTION;
 BEGIN
-	
-	SELECT 'Y' INTO V_WAREHOUSE_EXISTS 
-	FROM WAREHOUSE
-	WHERE WAREHOUSE_ID=in_warehouse_id;
-	
-	SELECT 'Y' INTO V_PRODUCT_EXISTS 
-	FROM PRODUCT
-	WHERE PRODUCT_ID=in_product_id;
-	
-	SELECT TOTAL_CAPACITY INTO V_WARE_CAPACITY
-	FROM WAREHOUSE
-	WHERE WAREHOUSE_ID=in_warehouse_id;
-	
-	IF(in_stock_quantity<0 OR in_stock_quantity>V_WARE_CAPACITY)
-	THEN RAISE E_INVALID_STOCK;
+    SELECT
+        'Y'
+    INTO v_warehouse_exists
+    FROM
+        warehouse
+    WHERE
+        warehouse_id = in_warehouse_id;
+
+    SELECT
+        'Y'
+    INTO v_product_exists
+    FROM
+        product
+    WHERE
+        product_id = in_product_id;
+
+    SELECT
+        total_capacity
+    INTO v_ware_capacity
+    FROM
+        warehouse
+    WHERE
+        warehouse_id = in_warehouse_id;
+
+    IF ( in_stock_quantity < 0 OR in_stock_quantity > v_ware_capacity ) THEN
+        RAISE e_invalid_stock;
     END IF;
-	
-	SELECT 'Y' INTO V_EXISTS 
-	FROM WARE_PRODUCT
-	WHERE WAREHOUSE_ID=in_warehouse_id
-	AND PRODUCT_ID=in_product_id;
-    
-    IF(V_EXISTS='Y') THEN
-    DBMS_OUTPUT.PUT_LINE('The product you are trying to add into this warehouse already exists');
-	END IF;
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        ware_product
+    WHERE
+            warehouse_id = in_warehouse_id
+        AND product_id = in_product_id;
 
+    IF ( v_exists = 'Y' ) THEN
+        dbms_output.put_line('The product you are trying to add into this warehouse already exists');
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN	
+    WHEN no_data_found THEN
+        IF ( v_warehouse_exists = 'N' ) THEN
+            dbms_output.put_line('Warehouse does not exist. Therefore you cannot add product into this warehouse');
+        ELSIF ( v_product_exists = 'N' ) THEN
+            dbms_output.put_line('Product is invalid. Try to add another product that exists.');
+        ELSIF ( v_exists = 'N' ) THEN
+            dbms_output.put_line('Ware Product does not exist. You can add product into this warehouse');
+            INSERT INTO ware_product VALUES (
+                ware_product_id_seq.NEXTVAL,
+                in_warehouse_id,
+                in_product_id,
+                in_stock_quantity
+            );
 
-	IF (V_WAREHOUSE_EXISTS='N') THEN
-	    DBMS_OUTPUT.PUT_LINE('Warehouse does not exist. Therefore you cannot add product into this warehouse');
-		
-	ELSIF (V_PRODUCT_EXISTS='N') THEN
-	    DBMS_OUTPUT.PUT_LINE('Product is invalid. Try to add another product that exists.');
-
-	ELSIF (V_EXISTS='N') THEN
-    DBMS_OUTPUT.PUT_LINE('Ware Product does not exist. You can add product into this warehouse');
-	
-	INSERT INTO ware_product VALUES (
-        ware_product_id_seq.NEXTVAL,
-        in_warehouse_id,
-        in_product_id,
-        in_stock_quantity
-    );
-    DBMS_OUTPUT.PUT_LINE('Ware Product Added');
-    COMMIT;
-	END IF;
-	
-WHEN E_INVALID_STOCK THEN
-	DBMS_OUTPUT.PUT_LINE('Quantity must be greater than 0 and less than or equal to warehouse capacity');
-
+            dbms_output.put_line('Ware Product Added');
+            COMMIT;
+        END IF;
+    WHEN e_invalid_stock THEN
+        dbms_output.put_line('Quantity must be greater than 0 and less than or equal to warehouse capacity');
 END add_ware_product;
 /
 
