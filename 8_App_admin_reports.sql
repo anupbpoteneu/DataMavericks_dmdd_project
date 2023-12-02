@@ -94,7 +94,7 @@ END get_customer_purchase_history;
 exec get_customer_purchase_history(2);
 
 ---------------------------------------------------------------------------
---5) Total overall revenue 
+--4) Total overall revenue 
 
 SET SERVEROUTPUT ON;
 CREATE OR REPLACE FUNCTION overall_revenue_report
@@ -126,7 +126,7 @@ END;
 /
 
 -------------------------------------------------------------------------
---6) View for inventory out of stock
+--5) View for inventory out of stock
 
 CREATE OR REPLACE VIEW vw_inventory_out_of_stock AS
 SELECT
@@ -142,3 +142,35 @@ WHERE
     wp.stock_quantity = 0;
 
 SELECT * FROM vw_inventory_out_of_stock;
+
+-------------------------------------------------------------------------
+
+
+--6) Order Fulfillment Report:
+--Summarizes the order fulfillment status for a specific user, including the user ID, user name, order status, and the total number of orders for each status.
+
+CREATE OR REPLACE PROCEDURE get_order_fulfillment_report(in_user_id NUMBER)
+IS
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Order Fulfillment Report:');
+    DBMS_OUTPUT.PUT_LINE('-------------------------------------');
+    FOR order_status IN (SELECT o.ORDER_STATUS,
+                                  COUNT(o.ORDER_ID) AS total_orders,
+                                  MAX(u.USER_ID) AS USER_ID,
+                                  MAX(u.USER_NAME) AS USER_NAME
+                           FROM vw_order_table o
+                           JOIN USER_TABLE u ON o.USER_ID = u.USER_ID
+                           WHERE o.USER_ID = in_user_id
+                           GROUP BY o.ORDER_STATUS)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('User ID: ' || order_status.USER_ID ||
+                             ', User Name: ' || order_status.USER_NAME ||
+                             ', Order Status: ' || order_status.ORDER_STATUS ||
+                             ', Total Orders: ' || order_status.total_orders);
+    END LOOP;
+END get_order_fulfillment_report;
+/
+
+--select * from user_table;
+
+exec get_order_fulfillment_report(2);
