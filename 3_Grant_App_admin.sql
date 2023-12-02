@@ -45,6 +45,7 @@ grant select on vw_product to inventory_manager;
 grant select on vw_product_category to inventory_manager;
 grant select on vw_ware_product to inventory_manager;
 grant select on vw_warehouse to inventory_manager;
+grant select on vw_inventory_out_of_stock to inventory_manager;
 
 --revoke select on product from inventory_manager;
 --revoke select on product_category from inventory_manager;
