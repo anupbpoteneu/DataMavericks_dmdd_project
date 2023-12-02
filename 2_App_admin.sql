@@ -655,3 +655,39 @@ CREATE OR REPLACE VIEW customer2_view AS
 SELECT *
 FROM order_table
 WHERE user_id = 3;
+
+-----------------------------------------------------------------------------
+--Trigger for orders
+
+CREATE OR REPLACE TRIGGER trg_order_completed AFTER
+    UPDATE OR INSERT ON order_table
+    FOR EACH ROW
+DECLARE
+    v_up_quantity NUMBER;
+BEGIN
+    IF :new.order_status = 'Completed' THEN
+        -- For each product in the order
+        FOR product_rec IN (
+            SELECT
+                product_id,
+                up_quantity
+            FROM
+                user_product
+            WHERE
+                order_id = :new.order_id
+        ) LOOP
+            -- Assign up_quantity to the variable
+            v_up_quantity := product_rec.up_quantity;
+ 
+            -- Update product table for the specific product
+            UPDATE product
+            SET
+                product_quantity = product_quantity - v_up_quantity
+            WHERE
+                product_id = product_rec.product_id;
+
+        END LOOP;
+
+    END IF;
+END;
+/
