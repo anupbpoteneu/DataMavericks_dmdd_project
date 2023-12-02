@@ -266,285 +266,384 @@ CREATE OR REPLACE VIEW VW_WAREHOUSE AS
 SELECT * FROM WAREHOUSE;
 
 ---------------------------------------------------------------------------------------
+--Package for creating global flag variable
+
+CREATE OR REPLACE PACKAGE my_package AS
+    recursion_flag NUMBER;
+END my_package;
+/
+
+CREATE OR REPLACE PACKAGE BODY my_package AS
+    recursion_flag NUMBER := 0;
+END my_package;
+/
+
+---------------------------------------------------------------------------------------
 --Procedures Creation
 
--- Procedure for adding a new Role
-CREATE OR REPLACE PROCEDURE add_role(in_role_name VARCHAR2) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+CREATE OR REPLACE PROCEDURE add_role (
+    in_role_name VARCHAR2
+) AS
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
-	SELECT 'Y' INTO V_EXISTS FROM ROLES WHERE ROLE_NAME=in_role_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-	
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        roles
+    WHERE
+        role_name = in_role_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-    INSERT INTO roles VALUES (role_id_seq.NEXTVAL, in_role_name);
-    DBMS_OUTPUT.PUT_LINE('Role Added');
-	COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Role already exists');
+    WHEN no_data_found THEN
+        INSERT INTO roles VALUES (
+            role_id_seq.NEXTVAL,
+            in_role_name
+        );
 
-
+        dbms_output.put_line('Role Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Role already exists');
 END add_role;
 /
--- Procedure for adding a new Product Category
-CREATE OR REPLACE PROCEDURE add_product_category(in_category_name VARCHAR2) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
-BEGIN
-	SELECT 'Y' INTO V_EXISTS FROM product_category WHERE category_name=in_category_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
 
+-- Procedure for adding a new Product Category
+
+CREATE OR REPLACE PROCEDURE add_product_category (
+    in_category_name VARCHAR2
+) AS
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
+BEGIN
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        product_category
+    WHERE
+        category_name = in_category_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO product_category VALUES (category_id_seq.NEXTVAL, in_category_name);
-    DBMS_OUTPUT.PUT_LINE('Product Category Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Category already exists');
-	
+    WHEN no_data_found THEN
+        INSERT INTO product_category VALUES (
+            category_id_seq.NEXTVAL,
+            in_category_name
+        );
+
+        dbms_output.put_line('Product Category Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Category already exists');
 END add_product_category;
 /
+
 -- Procedure for adding a new Warehouse
-CREATE OR REPLACE PROCEDURE add_warehouse(
+
+CREATE OR REPLACE PROCEDURE add_warehouse (
     in_warehouse_name VARCHAR2,
     in_total_capacity NUMBER,
     in_street_address VARCHAR2,
-    in_zip_code VARCHAR2,
-    in_city VARCHAR2,
-    in_state VARCHAR2,
-    in_country VARCHAR2
+    in_zip_code       VARCHAR2,
+    in_city           VARCHAR2,
+    in_state          VARCHAR2,
+    in_country        VARCHAR2
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
-    SELECT 'Y' INTO V_EXISTS FROM warehouse WHERE warehouse_name=in_warehouse_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-	
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        warehouse
+    WHERE
+        warehouse_name = in_warehouse_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO warehouse VALUES (
-        warehouse_id_seq.NEXTVAL,
-        in_warehouse_name,
-        in_total_capacity,
-        in_street_address,
-        in_zip_code,
-        in_city,
-        in_state,
-        in_country
-    );
-    DBMS_OUTPUT.PUT_LINE('Warehouse Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Warehouse already exists');
+    WHEN no_data_found THEN
+        INSERT INTO warehouse VALUES (
+            warehouse_id_seq.NEXTVAL,
+            in_warehouse_name,
+            in_total_capacity,
+            in_street_address,
+            in_zip_code,
+            in_city,
+            in_state,
+            in_country
+        );
+
+        dbms_output.put_line('Warehouse Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Warehouse already exists');
 END add_warehouse;
 /
 
 
 -- Procedure for adding a new Product
-CREATE OR REPLACE PROCEDURE add_product(
-    in_category_id NUMBER,
-    in_product_name VARCHAR2,
-    in_description VARCHAR2,
+
+CREATE OR REPLACE PROCEDURE add_product (
+    in_category_id      NUMBER,
+    in_product_name     VARCHAR2,
+    in_description      VARCHAR2,
     in_product_quantity NUMBER,
-    in_product_cost NUMBER
+    in_product_cost     NUMBER
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
-	SELECT 'Y' INTO V_EXISTS FROM product WHERE product_name=in_product_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-    
-	
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        product
+    WHERE
+        product_name = in_product_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO product VALUES (
-        product_id_seq.NEXTVAL,
-        in_category_id,
-        in_product_name,
-        in_description,
-        in_product_quantity,
-        in_product_cost
-    );
-    DBMS_OUTPUT.PUT_LINE('Product Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Product already exists');
-	
+    WHEN no_data_found THEN
+        INSERT INTO product VALUES (
+            product_id_seq.NEXTVAL,
+            in_category_id,
+            in_product_name,
+            in_description,
+            in_product_quantity,
+            in_product_cost
+        );
+
+        dbms_output.put_line('Product Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Product already exists');
 END add_product;
 /
 
 -- Procedure for adding a new Ware Product
-CREATE OR REPLACE PROCEDURE add_ware_product(
-    in_warehouse_id NUMBER,
-    in_product_id NUMBER,
+
+CREATE OR REPLACE PROCEDURE add_ware_product (
+    in_warehouse_id   NUMBER,
+    in_product_id     NUMBER,
     in_stock_quantity NUMBER
 ) AS
-V_EXISTS VARCHAR(10):='N';
-V_WAREHOUSE_EXISTS VARCHAR(10):='N';
-V_PRODUCT_EXISTS VARCHAR(10):='N';
-V_WARE_CAPACITY NUMBER;
-E_INVALID_STOCK EXCEPTION;
+
+    v_exists           VARCHAR(10) := 'N';
+    v_warehouse_exists VARCHAR(10) := 'N';
+    v_product_exists   VARCHAR(10) := 'N';
+    v_ware_capacity    NUMBER;
+    e_invalid_stock EXCEPTION;
 BEGIN
-	
-	SELECT 'Y' INTO V_WAREHOUSE_EXISTS 
-	FROM WAREHOUSE
-	WHERE WAREHOUSE_ID=in_warehouse_id;
-	
-	SELECT 'Y' INTO V_PRODUCT_EXISTS 
-	FROM PRODUCT
-	WHERE PRODUCT_ID=in_product_id;
-	
-	SELECT TOTAL_CAPACITY INTO V_WARE_CAPACITY
-	FROM WAREHOUSE
-	WHERE WAREHOUSE_ID=in_warehouse_id;
-	
-	IF(in_stock_quantity<0 OR in_stock_quantity>V_WARE_CAPACITY)
-	THEN RAISE E_INVALID_STOCK;
+    SELECT
+        'Y'
+    INTO v_warehouse_exists
+    FROM
+        warehouse
+    WHERE
+        warehouse_id = in_warehouse_id;
+
+    SELECT
+        'Y'
+    INTO v_product_exists
+    FROM
+        product
+    WHERE
+        product_id = in_product_id;
+
+    SELECT
+        total_capacity
+    INTO v_ware_capacity
+    FROM
+        warehouse
+    WHERE
+        warehouse_id = in_warehouse_id;
+
+    IF ( in_stock_quantity < 0 OR in_stock_quantity > v_ware_capacity ) THEN
+        RAISE e_invalid_stock;
     END IF;
-	
-	SELECT 'Y' INTO V_EXISTS 
-	FROM WARE_PRODUCT
-	WHERE WAREHOUSE_ID=in_warehouse_id
-	AND PRODUCT_ID=in_product_id;
-    
-    IF(V_EXISTS='Y') THEN
-    DBMS_OUTPUT.PUT_LINE('The product you are trying to add into this warehouse already exists');
-	END IF;
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        ware_product
+    WHERE
+            warehouse_id = in_warehouse_id
+        AND product_id = in_product_id;
 
+    IF ( v_exists = 'Y' ) THEN
+        dbms_output.put_line('The product you are trying to add into this warehouse already exists');
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN	
+    WHEN no_data_found THEN
+        IF ( v_warehouse_exists = 'N' ) THEN
+            dbms_output.put_line('Warehouse does not exist. Therefore you cannot add product into this warehouse');
+        ELSIF ( v_product_exists = 'N' ) THEN
+            dbms_output.put_line('Product is invalid. Try to add another product that exists.');
+        ELSIF ( v_exists = 'N' ) THEN
+            dbms_output.put_line('Ware Product does not exist. You can add product into this warehouse');
+            INSERT INTO ware_product VALUES (
+                ware_product_id_seq.NEXTVAL,
+                in_warehouse_id,
+                in_product_id,
+                in_stock_quantity
+            );
 
-	IF (V_WAREHOUSE_EXISTS='N') THEN
-	    DBMS_OUTPUT.PUT_LINE('Warehouse does not exist. Therefore you cannot add product into this warehouse');
-		
-	ELSIF (V_PRODUCT_EXISTS='N') THEN
-	    DBMS_OUTPUT.PUT_LINE('Product is invalid. Try to add another product that exists.');
-
-	ELSIF (V_EXISTS='N') THEN
-    DBMS_OUTPUT.PUT_LINE('Ware Product does not exist. You can add product into this warehouse');
-	
-	INSERT INTO ware_product VALUES (
-        ware_product_id_seq.NEXTVAL,
-        in_warehouse_id,
-        in_product_id,
-        in_stock_quantity
-    );
-    DBMS_OUTPUT.PUT_LINE('Ware Product Added');
-    COMMIT;
-	END IF;
-	
-WHEN E_INVALID_STOCK THEN
-	DBMS_OUTPUT.PUT_LINE('Quantity must be greater than 0 and less than or equal to warehouse capacity');
-
+            dbms_output.put_line('Ware Product Added');
+            COMMIT;
+        END IF;
+    WHEN e_invalid_stock THEN
+        dbms_output.put_line('Quantity must be greater than 0 and less than or equal to warehouse capacity');
 END add_ware_product;
 /
 
 -- Procedure for adding a new user
-CREATE OR REPLACE PROCEDURE add_user(
-    in_role_id NUMBER,
-    in_user_name VARCHAR2,
-    in_email_address VARCHAR2,
+
+CREATE OR REPLACE PROCEDURE add_user (
+    in_role_id        NUMBER,
+    in_user_name      VARCHAR2,
+    in_email_address  VARCHAR2,
     in_street_address VARCHAR2,
-    in_city VARCHAR2,
-    in_zipcode VARCHAR2,
-    in_country VARCHAR2,
-    in_state VARCHAR2,
-    in_phone_number VARCHAR2
+    in_city           VARCHAR2,
+    in_zipcode        VARCHAR2,
+    in_country        VARCHAR2,
+    in_state          VARCHAR2,
+    in_phone_number   VARCHAR2
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        user_table
+    WHERE
+        user_name = in_user_name
+        OR email_address = in_email_address;
 
-	SELECT 'Y' INTO V_EXISTS FROM user_table WHERE user_name=in_user_name OR email_address=in_email_address;
-		
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-    
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO user_table VALUES (
-        user_id_seq.NEXTVAL,
-        in_role_id,
-        in_user_name,
-        in_email_address,
-        in_street_address,
-        in_city,
-        in_zipcode,
-        in_country,
-        in_state,
-        in_phone_number
-    );
-    DBMS_OUTPUT.PUT_LINE('User Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('User already exists with same user name or email address');	
+    WHEN no_data_found THEN
+        INSERT INTO user_table VALUES (
+            user_id_seq.NEXTVAL,
+            in_role_id,
+            in_user_name,
+            in_email_address,
+            in_street_address,
+            in_city,
+            in_zipcode,
+            in_country,
+            in_state,
+            in_phone_number
+        );
 
+        dbms_output.put_line('User Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('User already exists with same user name or email address');
 END add_user;
 /
 
 -- Procedure for adding a new Order
-CREATE OR REPLACE PROCEDURE add_order(
-    in_user_id NUMBER,
+
+CREATE OR REPLACE PROCEDURE add_order (
+    in_user_id      NUMBER,
     in_order_status VARCHAR2
 ) AS
 BEGIN
+    IF ( in_order_status != 'Pending' ) THEN
+        dbms_output.put_line('Order status is invalid.');
+    ELSE
+        INSERT INTO order_table (
+            order_id,
+            user_id,
+            order_status
+        ) VALUES (
+            order_id_seq.NEXTVAL,
+            in_user_id,
+            in_order_status
+        );
 
-	IF (in_order_status !='Pending') THEN
-    DBMS_OUTPUT.PUT_LINE('Order status is invalid.');
-	
-	ELSE
-    INSERT INTO order_table VALUES (
-        order_id_seq.NEXTVAL,
-        in_user_id,
-        in_order_qty,
-        in_order_status,
-        SYSDATE
-    );
-    DBMS_OUTPUT.PUT_LINE('Order Added');
-    COMMIT;
-	END IF;
+        dbms_output.put_line('Order Added');
+        COMMIT;
+    END IF;
 END add_order;
 /
 
 -- Procedure for adding a new User Product
-CREATE OR REPLACE PROCEDURE add_user_product(
-    in_product_id NUMBER,
-    in_order_id NUMBER,
+
+CREATE OR REPLACE PROCEDURE add_user_product (
+    in_product_id  NUMBER,
+    in_order_id    NUMBER,
     in_up_quantity NUMBER
 ) AS
-    v_product_cost NUMBER;
-    v_order_exist varchar(10):='N';
-    v_product_exist varchar(10):='N';
+
+    v_product_cost  NUMBER;
+    v_order_exist   VARCHAR(10) := 'N';
+    v_product_exist VARCHAR(10) := 'N';
+    v_product_qty   NUMBER;
 BEGIN
 
     --Check if Order exists
-    SELECT 'Y' INTO v_order_exist
-    FROM ORDER_TABLE
-    WHERE order_id=in_order_id
-    and order_status='Pending';
-    
-    SELECT 'Y' INTO v_product_exist
-    FROM PRODUCT
-    WHERE product_id=in_product_id;
-     
-    IF (in_up_quantity<=0) THEN
-        DBMS_OUTPUT.PUT_LINE('Quantity must be greater than 0');
-    
+    SELECT
+        'Y'
+    INTO v_order_exist
+    FROM
+        order_table
+    WHERE
+            order_id = in_order_id
+        AND order_status = 'Pending';
+
+    SELECT
+        'Y'
+    INTO v_product_exist
+    FROM
+        product
+    WHERE
+        product_id = in_product_id;
+
+    SELECT
+        product_quantity
+    INTO v_product_qty
+    FROM
+        product
+    WHERE
+        product_id = in_product_id;
+
+    IF ( in_up_quantity <= 0 ) THEN
+        dbms_output.put_line('Quantity must be greater than 0');
+        
+    ELSIF ( v_product_qty = 0 ) THEN
+        dbms_output.put_line('Product currently unavialable.');
+                                 
+    ELSIF ( in_up_quantity > v_product_qty ) THEN
+        dbms_output.put_line('The available quantity of this product is: '
+                             || v_product_qty
+                             || '.Please try to order equal or lesser than the available quantity');
+                                                 
     ELSE
         -- Retrieve the product cost
-        SELECT product_cost INTO v_product_cost
-        FROM product
-        WHERE product_id = in_product_id;
+        SELECT
+            product_cost
+        INTO v_product_cost
+        FROM
+            product
+        WHERE
+            product_id = in_product_id;
                 
         -- Insert into user_product with calculated up_price
         INSERT INTO user_product VALUES (
@@ -554,66 +653,79 @@ BEGIN
             in_up_quantity,
             in_up_quantity * v_product_cost -- Calculate up_price
         );
-        DBMS_OUTPUT.PUT_LINE('User Product Added');
+
+        dbms_output.put_line('User Product Added');
         COMMIT;
     END IF;
+
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-IF (v_order_exist='N') THEN
-DBMS_OUTPUT.PUT_LINE('You cannot add products against an order which is already completed or does not exist. Please place a new order and add products to it!');
-
-ELSIF(v_product_exist='N') THEN
-DBMS_OUTPUT.PUT_LINE('Unfortunately, the product you have chosen does not exist in our catalog.');
-END IF;   
-
+    WHEN no_data_found THEN
+        IF ( v_order_exist = 'N' ) THEN
+            dbms_output.put_line('You cannot add products against an order which is already completed or does not exist. Please place a new order and add products to it!'
+            );
+        ELSIF ( v_product_exist = 'N' ) THEN
+            dbms_output.put_line('Unfortunately, the product you have chosen does not exist in our catalog.');
+        END IF;
 END add_user_product;
 /
--- Procedure for adding a new Payment
-CREATE OR REPLACE PROCEDURE add_payment(
-    in_order_id NUMBER,
-    in_payment_mode VARCHAR2,
+
+
+-- Procedure for adding a new Product
+
+CREATE OR REPLACE PROCEDURE add_payment (
+    in_order_id       NUMBER,
+    in_payment_mode   VARCHAR2,
     in_payment_status VARCHAR2
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists  VARCHAR(5);
+    e_exists EXCEPTION;
+    up_exists NUMBER := 0;
 BEGIN
+    SELECT
+        COUNT(*)
+    INTO up_exists
+    FROM
+        user_product
+    WHERE
+        order_id = in_order_id;
 
-    SELECT 'Y' INTO V_EXISTS FROM PAYMENT WHERE order_id=in_order_id
-    AND payment_status='Completed' ;
-	
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        payment
+    WHERE
+            order_id = in_order_id
+        AND payment_status = 'Completed';
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-    IF (in_payment_status NOT IN ('Failed', 'Completed')) THEN
-    DBMS_OUTPUT.PUT_LINE('Payment status is invalid.');
-    
-    ELSE
-    INSERT INTO payment VALUES (
-    payment_id_seq.NEXTVAL,
-        in_order_id,
-        in_payment_mode,
-        SYSDATE,
-        in_payment_status
-    );
-    COMMIT;
+    WHEN no_data_found THEN
+        IF ( up_exists = 0 ) THEN
+            dbms_output.put_line('YOU HAVE NOT ADDED ANY PRODUCTS TO YOUR CART, YOU CANNOT PROCEED WITH PAYMENT!');
+        ELSIF ( in_payment_status NOT IN ( 'Failed', 'Completed' ) ) THEN
+            dbms_output.put_line('Payment status is invalid.');
+        ELSE
+            INSERT INTO payment VALUES (
+                payment_id_seq.NEXTVAL,
+                in_order_id,
+                in_payment_mode,
+                sysdate,
+                in_payment_status
+            );
 
-    END IF;
-    
-    IF(in_payment_status='Failed') THEN
-    DBMS_OUTPUT.PUT_LINE('Payment failed');
-    
-    ELSIF(in_payment_status='Completed') THEN
-    DBMS_OUTPUT.PUT_LINE('Payment is successfully completed');
-    END IF;
-    
-    WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Payment for this order is already completed');
-
+            dbms_output.put_line('Payment ' || in_payment_status);
+            COMMIT;
+        END IF;
+    WHEN e_exists THEN
+        dbms_output.put_line('Payment for this order is already completed');
 END add_payment;
 /
- 
+
+
+
 ------------------------------------------------------------
 
 --Inserting records
@@ -630,3 +742,154 @@ EXEC add_user(2, 'customer1', 'customer1@example.com', '123 Beckon St', 'Atlanta
 EXEC add_user(2, 'customer2', 'customer2@example.com', '789 Bolyston st', 'Newyork', '0666','USA', 'Newyork', '555-555-5555');
 EXEC add_user(3, 'product_manager', 'productmanager@example.com', '123 Harbour Street','Sydney', '0780', 'Australia', 'Sydney', '555-555-5556');
 EXEC add_user(4, 'inventory_manager', 'inventorymanager@example.com', '789 Sakura Avenue', 'Tokyo', '0888', 'Japan', 'Tokyo', '123-456-7891');
+
+---------------------------------------------------------------------------
+--Views for customers
+
+CREATE OR REPLACE VIEW customer1_view AS
+SELECT *
+FROM order_table
+WHERE user_id = 2;
+
+CREATE OR REPLACE VIEW customer2_view AS
+SELECT *
+FROM order_table
+WHERE user_id = 3;
+
+-----------------------------------------------------------------------------
+--Trigger for orders
+
+CREATE OR REPLACE TRIGGER trg_order_completed AFTER
+    UPDATE OR INSERT ON order_table
+    FOR EACH ROW
+DECLARE
+    v_up_quantity NUMBER;
+BEGIN
+    IF :new.order_status = 'Completed' THEN
+        -- For each product in the order
+        FOR product_rec IN (
+            SELECT
+                product_id,
+                up_quantity
+            FROM
+                user_product
+            WHERE
+                order_id = :new.order_id
+        ) LOOP
+            -- Assign up_quantity to the variable
+            v_up_quantity := product_rec.up_quantity;
+ 
+            -- Update product table for the specific product
+            UPDATE product
+            SET
+                product_quantity = product_quantity - v_up_quantity
+            WHERE
+                product_id = product_rec.product_id;
+
+        END LOOP;
+
+    END IF;
+END;
+/
+
+----------------------
+
+---------------------------------------------------
+-- Trigger on Payment Table:
+
+CREATE OR REPLACE TRIGGER trg_payment_completed AFTER
+    INSERT OR UPDATE ON payment
+    FOR EACH ROW
+DECLARE
+    v_order_qty NUMBER;
+BEGIN
+    IF :new.payment_status = 'Completed' THEN
+        -- Calculate the total order quantity
+        SELECT
+            SUM(up_quantity)
+        INTO v_order_qty
+        FROM
+            user_product
+        WHERE
+            order_id = :new.order_id;
+
+        -- Update order_table with the total order quantity and completion date
+        UPDATE order_table
+        SET
+            order_status = 'Completed',
+            order_qty = v_order_qty,
+            order_date = sysdate
+        WHERE
+            order_id = :new.order_id;
+     
+    END IF;
+END;
+/
+
+-- Trigger for product and ware_product refill
+
+CREATE OR REPLACE TRIGGER manage_stock_quantity AFTER
+    UPDATE ON product
+DECLARE
+    v_stock_to_reduce NUMBER := 15;
+    v_reduced_qty     NUMBER := 0;
+BEGIN
+    -- Check the recursion flag in the package
+    IF my_package.recursion_flag = 1 THEN
+        -- The trigger has already been executed, exit to avoid recursion
+        my_package.recursion_flag := 0;
+        RETURN;
+    END IF;
+
+    -- Set the recursion flag to 1 to indicate trigger execution
+    my_package.recursion_flag := 1;
+
+    -- Reduce stock quantity in ware_product table
+    << outer_loop >> FOR product_rec IN (
+        SELECT
+            product_id,
+            product_quantity
+        FROM
+            product
+        WHERE
+            product_quantity < 10
+    ) LOOP
+        << inner_loop >> FOR ware_prod IN (
+            SELECT
+                warehouse_id,
+                product_id,
+                stock_quantity
+            FROM
+                ware_product
+            WHERE
+                    product_id = product_rec.product_id
+                AND stock_quantity != 0
+        ) LOOP
+            v_reduced_qty := v_stock_to_reduce - v_reduced_qty;
+            IF ware_prod.stock_quantity >= v_reduced_qty THEN
+                -- Update product table for the specific product
+                UPDATE ware_product
+                SET
+                    stock_quantity = stock_quantity - v_reduced_qty
+                WHERE
+                        product_id = product_rec.product_id
+                    AND warehouse_id = ware_prod.warehouse_id;
+
+                UPDATE product
+                SET
+                    product_quantity = product_quantity + v_reduced_qty
+                WHERE
+                    product_id = product_rec.product_id;
+
+                EXIT inner_loop;
+
+            END IF;
+
+        END LOOP;
+    END LOOP;
+
+--    -- Reset the recursion flag after trigger execution
+    my_package.recursion_flag := 0;
+END;
+/
+
