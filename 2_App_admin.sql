@@ -310,39 +310,47 @@ WHEN E_EXISTS THEN
 END add_product_category;
 /
 -- Procedure for adding a new Warehouse
-CREATE OR REPLACE PROCEDURE add_warehouse(
+
+CREATE OR REPLACE PROCEDURE add_warehouse (
     in_warehouse_name VARCHAR2,
     in_total_capacity NUMBER,
     in_street_address VARCHAR2,
-    in_zip_code VARCHAR2,
-    in_city VARCHAR2,
-    in_state VARCHAR2,
-    in_country VARCHAR2
+    in_zip_code       VARCHAR2,
+    in_city           VARCHAR2,
+    in_state          VARCHAR2,
+    in_country        VARCHAR2
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
-    SELECT 'Y' INTO V_EXISTS FROM warehouse WHERE warehouse_name=in_warehouse_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-	
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        warehouse
+    WHERE
+        warehouse_name = in_warehouse_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO warehouse VALUES (
-        warehouse_id_seq.NEXTVAL,
-        in_warehouse_name,
-        in_total_capacity,
-        in_street_address,
-        in_zip_code,
-        in_city,
-        in_state,
-        in_country
-    );
-    DBMS_OUTPUT.PUT_LINE('Warehouse Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Warehouse already exists');
+    WHEN no_data_found THEN
+        INSERT INTO warehouse VALUES (
+            warehouse_id_seq.NEXTVAL,
+            in_warehouse_name,
+            in_total_capacity,
+            in_street_address,
+            in_zip_code,
+            in_city,
+            in_state,
+            in_country
+        );
+
+        dbms_output.put_line('Warehouse Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Warehouse already exists');
 END add_warehouse;
 /
 
@@ -449,46 +457,52 @@ END add_ware_product;
 /
 
 -- Procedure for adding a new user
-CREATE OR REPLACE PROCEDURE add_user(
-    in_role_id NUMBER,
-    in_user_name VARCHAR2,
-    in_email_address VARCHAR2,
+
+CREATE OR REPLACE PROCEDURE add_user (
+    in_role_id        NUMBER,
+    in_user_name      VARCHAR2,
+    in_email_address  VARCHAR2,
     in_street_address VARCHAR2,
-    in_city VARCHAR2,
-    in_zipcode VARCHAR2,
-    in_country VARCHAR2,
-    in_state VARCHAR2,
-    in_phone_number VARCHAR2
+    in_city           VARCHAR2,
+    in_zipcode        VARCHAR2,
+    in_country        VARCHAR2,
+    in_state          VARCHAR2,
+    in_phone_number   VARCHAR2
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        user_table
+    WHERE
+        user_name = in_user_name
+        OR email_address = in_email_address;
 
-	SELECT 'Y' INTO V_EXISTS FROM user_table WHERE user_name=in_user_name OR email_address=in_email_address;
-		
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-    
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO user_table VALUES (
-        user_id_seq.NEXTVAL,
-        in_role_id,
-        in_user_name,
-        in_email_address,
-        in_street_address,
-        in_city,
-        in_zipcode,
-        in_country,
-        in_state,
-        in_phone_number
-    );
-    DBMS_OUTPUT.PUT_LINE('User Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('User already exists with same user name or email address');	
+    WHEN no_data_found THEN
+        INSERT INTO user_table VALUES (
+            user_id_seq.NEXTVAL,
+            in_role_id,
+            in_user_name,
+            in_email_address,
+            in_street_address,
+            in_city,
+            in_zipcode,
+            in_country,
+            in_state,
+            in_phone_number
+        );
 
+        dbms_output.put_line('User Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('User already exists with same user name or email address');
 END add_user;
 /
 
