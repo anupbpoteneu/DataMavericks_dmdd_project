@@ -92,3 +92,53 @@ END get_customer_purchase_history;
 /
 
 exec get_customer_purchase_history(2);
+
+---------------------------------------------------------------------------
+--5) Total overall revenue 
+
+SET SERVEROUTPUT ON;
+CREATE OR REPLACE FUNCTION overall_revenue_report
+RETURN NUMBER
+IS
+    v_total_revenue NUMBER;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Total Overall Revenue Report:');
+    DBMS_OUTPUT.PUT_LINE('-------------------------------------');
+    
+    SELECT SUM(up.up_price) INTO v_total_revenue
+    FROM vw_user_product up
+    JOIN vw_order_table o
+    ON o.order_id=up.order_id
+    WHERE o.order_status='Completed';
+
+    RETURN v_total_revenue;
+END overall_revenue_report;
+/
+
+DECLARE
+    v_total_revenue NUMBER;
+BEGIN
+
+    v_total_revenue := overall_revenue_report;
+
+    DBMS_OUTPUT.PUT_LINE('Total Overall Revenue: ' || v_total_revenue);
+END;
+/
+
+-------------------------------------------------------------------------
+--6) View for inventory out of stock
+
+CREATE OR REPLACE VIEW vw_inventory_out_of_stock AS
+SELECT
+    wp.stock_quantity,
+    w.warehouse_id,
+    w.warehouse_name,
+    w.state
+FROM
+    ware_product wp
+JOIN
+    warehouse w ON wp.warehouse_id = w.warehouse_id
+WHERE
+    wp.stock_quantity = 0;
+
+SELECT * FROM vw_inventory_out_of_stock;
