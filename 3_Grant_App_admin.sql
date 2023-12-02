@@ -59,6 +59,7 @@ grant create session to customer1;
 grant execute on add_user_product to customer1;
 grant execute on add_payment to customer1;
 grant execute on add_order to customer1;
+grant select on customer1_view to customer1;
 grant select on vw_product to customer1;
 grant select on vw_product_category to customer1;
 ----
@@ -69,5 +70,6 @@ grant create session to customer2;
 grant execute on add_user_product to customer2;
 grant execute on add_payment to customer2;
 grant execute on add_order to customer2;
+grant select on customer2_view to customer2;
 grant select on vw_product to customer2;
 grant select on vw_product_category to customer2;
