@@ -313,25 +313,38 @@ END add_role;
 /
 
 -- Procedure for adding a new Product Category
-CREATE OR REPLACE PROCEDURE add_product_category(in_category_name VARCHAR2) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
-BEGIN
-	SELECT 'Y' INTO V_EXISTS FROM product_category WHERE category_name=in_category_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
 
+CREATE OR REPLACE PROCEDURE add_product_category (
+    in_category_name VARCHAR2
+) AS
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
+BEGIN
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        product_category
+    WHERE
+        category_name = in_category_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO product_category VALUES (category_id_seq.NEXTVAL, in_category_name);
-    DBMS_OUTPUT.PUT_LINE('Product Category Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Category already exists');
-	
+    WHEN no_data_found THEN
+        INSERT INTO product_category VALUES (
+            category_id_seq.NEXTVAL,
+            in_category_name
+        );
+
+        dbms_output.put_line('Product Category Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Category already exists');
 END add_product_category;
 /
+
 -- Procedure for adding a new Warehouse
 
 CREATE OR REPLACE PROCEDURE add_warehouse (
@@ -379,37 +392,43 @@ END add_warehouse;
 
 
 -- Procedure for adding a new Product
-CREATE OR REPLACE PROCEDURE add_product(
-    in_category_id NUMBER,
-    in_product_name VARCHAR2,
-    in_description VARCHAR2,
+
+CREATE OR REPLACE PROCEDURE add_product (
+    in_category_id      NUMBER,
+    in_product_name     VARCHAR2,
+    in_description      VARCHAR2,
     in_product_quantity NUMBER,
-    in_product_cost NUMBER
+    in_product_cost     NUMBER
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists VARCHAR(5);
+    e_exists EXCEPTION;
 BEGIN
-	SELECT 'Y' INTO V_EXISTS FROM product WHERE product_name=in_product_name;
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
-    
-	
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        product
+    WHERE
+        product_name = in_product_name;
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-WHEN NO_DATA_FOUND THEN
-	INSERT INTO product VALUES (
-        product_id_seq.NEXTVAL,
-        in_category_id,
-        in_product_name,
-        in_description,
-        in_product_quantity,
-        in_product_cost
-    );
-    DBMS_OUTPUT.PUT_LINE('Product Added');
-    COMMIT;
-WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Product already exists');
-	
+    WHEN no_data_found THEN
+        INSERT INTO product VALUES (
+            product_id_seq.NEXTVAL,
+            in_category_id,
+            in_product_name,
+            in_description,
+            in_product_quantity,
+            in_product_cost
+        );
+
+        dbms_output.put_line('Product Added');
+        COMMIT;
+    WHEN e_exists THEN
+        dbms_output.put_line('Product already exists');
 END add_product;
 /
 
@@ -650,51 +669,61 @@ EXCEPTION
 END add_user_product;
 /
 
--- Procedure for adding a new Payment
-CREATE OR REPLACE PROCEDURE add_payment(
-    in_order_id NUMBER,
-    in_payment_mode VARCHAR2,
+
+-- Procedure for adding a new Product
+
+CREATE OR REPLACE PROCEDURE add_payment (
+    in_order_id       NUMBER,
+    in_payment_mode   VARCHAR2,
     in_payment_status VARCHAR2
 ) AS
-V_EXISTS VARCHAR(5);
-E_EXISTS EXCEPTION;
+    v_exists  VARCHAR(5);
+    e_exists EXCEPTION;
+    up_exists NUMBER := 0;
 BEGIN
+    SELECT
+        COUNT(*)
+    INTO up_exists
+    FROM
+        user_product
+    WHERE
+        order_id = in_order_id;
 
-    SELECT 'Y' INTO V_EXISTS FROM PAYMENT WHERE order_id=in_order_id
-    AND payment_status='Completed' ;
-	
-	IF(V_EXISTS='Y')
-	THEN RAISE E_EXISTS;
-	END IF;
+    SELECT
+        'Y'
+    INTO v_exists
+    FROM
+        payment
+    WHERE
+            order_id = in_order_id
+        AND payment_status = 'Completed';
+
+    IF ( v_exists = 'Y' ) THEN
+        RAISE e_exists;
+    END IF;
 EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-    IF (in_payment_status NOT IN ('Failed', 'Completed')) THEN
-    DBMS_OUTPUT.PUT_LINE('Payment status is invalid.');
-    
-    ELSE
-    INSERT INTO payment VALUES (
-    payment_id_seq.NEXTVAL,
-        in_order_id,
-        in_payment_mode,
-        SYSDATE,
-        in_payment_status
-    );
-    COMMIT;
+    WHEN no_data_found THEN
+        IF ( up_exists = 0 ) THEN
+            dbms_output.put_line('YOU HAVE NOT ADDED ANY PRODUCTS TO YOUR CART, YOU CANNOT PROCEED WITH PAYMENT!');
+        ELSIF ( in_payment_status NOT IN ( 'Failed', 'Completed' ) ) THEN
+            dbms_output.put_line('Payment status is invalid.');
+        ELSE
+            INSERT INTO payment VALUES (
+                payment_id_seq.NEXTVAL,
+                in_order_id,
+                in_payment_mode,
+                sysdate,
+                in_payment_status
+            );
 
-    END IF;
-    
-    IF(in_payment_status='Failed') THEN
-    DBMS_OUTPUT.PUT_LINE('Payment failed');
-    
-    ELSIF(in_payment_status='Completed') THEN
-    DBMS_OUTPUT.PUT_LINE('Payment is successfully completed');
-    END IF;
-    
-    WHEN E_EXISTS THEN
-    DBMS_OUTPUT.PUT_LINE('Payment for this order is already completed');
-
+            dbms_output.put_line('Payment ' || in_payment_status);
+            COMMIT;
+        END IF;
+    WHEN e_exists THEN
+        dbms_output.put_line('Payment for this order is already completed');
 END add_payment;
 /
+
 
 
 ------------------------------------------------------------
